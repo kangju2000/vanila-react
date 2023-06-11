@@ -43,19 +43,3 @@
   gap: 5px;
 }
 
-.todolist__item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px;
-  border: 1px solid #000;
-  border-radius: 5px;
-}
-
-.todolist__item__text {
-  font-size: 20px;
-}
-
-.todolist__button__delete {
-  padding: 5px;
-}

@@ -1,0 +1,23 @@
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border: 1px solid #000;
+  border-radius: 5px;
+}
+
+.item__text {
+  margin-left: 5px;
+  font-size: 20px;
+}
+
+.item__text__done {
+  margin-left: 5px;
+  font-size: 20px;
+  text-decoration: line-through;
+}
+
+.button__delete {
+  padding: 5px;
+}

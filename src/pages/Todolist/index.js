@@ -1,3 +1,4 @@
+import TodoItem from "../../components/TodoItem";
 import Kreact from "../../core/Kreact"
 import styles from './index.module.css'
 
@@ -14,25 +15,26 @@ export default function TodoList() {
       return;
     }
 
-    setList(prev => {
-      return [...prev, { id: prev.length, todo: value, idDone: false }]
-    })
+    setList(prev =>
+      [...prev, { id: prev.length, todo: value, idDone: false }]
+    )
 
     e.target[0].value = '';
   };
 
   const handleCheckClick = (id) => {
-    setList(prev => {
-      return prev.map(item => {
-        if (item.id === id) {
-          return { ...item, idDone: !item.idDone }
-        }
-        return item;
-      })
-    })
+    setList(prev =>
+      prev.map(item =>
+        item.id === id
+          ? { ...item, idDone: !item.idDone }
+          : item
+      )
+    );
   };
 
   const handleDeleteClick = (id) => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+
     setList(prev => {
       return prev.filter(item => item.id !== id)
     })
@@ -49,20 +51,8 @@ export default function TodoList() {
       <ul className={styles.todolist__list}>
         {
           list.map((item, index) =>
-          (
-            <li key={index} className={styles.todolist__item}>
-              <div style={{ display: 'flex' }}>
-                {
-                  item.idDone ?
-                    <input type="checkbox" onClick={() => handleCheckClick(item.id)} checked />
-                    :
-                    <input type="checkbox" onClick={() => handleCheckClick(item.id)} />
-                }
-                <span className={styles.todolist__item__text}>{item.todo}</span>
-              </div>
-              <button className={styles.todolist__button__delete} onClick={() => handleDeleteClick(item.id)}>삭제</button>
-            </li>
-          ))
+            <TodoItem key={index} item={item} onCheckclick={handleCheckClick} onDeleteClick={handleDeleteClick} />
+          )
         }
       </ul>
     </div>
