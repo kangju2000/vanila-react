@@ -1,20 +1,46 @@
-import { render } from "../Kreact";
+import { render } from '../Kreact';
 
-export default function createRouter(root, routes = []) {
+interface Route {
+  pathname: string;
+  element: Function;
+  children?: Route[];
+}
+
+interface RouteMapValue {
+  element: Route['element'];
+  type: 'parent' | 'child';
+  parentPathname: Route['pathname'];
+  outlet: boolean;
+}
+
+interface createRouterFunction {
+  (root: HTMLElement, routes: Route[]): {
+    push: (pathname: string, state?: { outlet?: boolean }) => void;
+    routes: Route[];
+  };
+}
+
+const createRouter: createRouterFunction = (root, routes = []) => {
   const history = window.history;
-  const routeMap = new Map();
+  const routeMap = new Map<Route['pathname'], RouteMapValue>();
 
   routes.forEach(({ pathname, element, children }) => {
     routeMap.set(pathname, { element, type: 'parent', parentPathname: null, outlet: false });
 
-    children && children.forEach(({ pathname: childPathname, element }) => {
-      if (childPathname.startsWith('/')) throw new Error('childPathname must not start with /');
+    children &&
+      children.forEach(({ pathname: childPathname, element }) => {
+        if (childPathname.startsWith('/')) throw new Error('childPathname must not start with /');
 
-      routeMap.set(pathname + childPathname, { element, type: 'child', parentPathname: pathname, outlet: false });
-    });
+        routeMap.set(pathname + childPathname, {
+          element,
+          type: 'child',
+          parentPathname: pathname,
+          outlet: false,
+        });
+      });
   });
 
-  function push(pathname, state) {
+  function push(pathname: string, state: { outlet?: boolean } = {}) {
     history.pushState(state, null, pathname);
 
     if (state?.outlet) {
@@ -56,6 +82,8 @@ export default function createRouter(root, routes = []) {
 
   return {
     push,
-    routes
-  }
-}
+    routes,
+  };
+};
+
+export default createRouter;

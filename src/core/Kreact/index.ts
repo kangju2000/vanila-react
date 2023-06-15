@@ -1,15 +1,5 @@
 import { updateRealDOM, updateVirtualDOM } from '../KreactDOM';
 
-type KreactElement = {
-  type: string | Function;
-  props: {
-    children: KreactElement[];
-    nodeValue?: string;
-    ref?: any;
-    key?: any;
-  };
-};
-
 function kreact() {
   const _states = [];
   let _stateIndex = 0;
@@ -60,9 +50,10 @@ function kreact() {
   }
 
   function createElement(type: any, config: any, ...children: any[]) {
-    const props: KreactElement['props'] = {
+    const props: Kreact.KreactElement['props'] = {
       children: [],
     };
+
     let ref = null;
     let key = null;
 
@@ -124,9 +115,12 @@ function kreact() {
     return element;
   }
 
-  function fragment(props: KreactElement['props'], key: KreactElement['props']['key']) {
+  function fragment(
+    props: Kreact.KreactElement['props'],
+    key: Kreact.KreactElement['props']['key'],
+  ): Kreact.KreactFragment {
     const element = {
-      type: 'FRAGMENT',
+      type: 'FRAGMENT' as const,
       props: {
         ...props,
         key,
@@ -147,7 +141,7 @@ function kreact() {
     _oldNode = _newNode;
   }
 
-  function render(root, component) {
+  function render(root: HTMLElement, component: Function) {
     _root = root;
     _rootComponent = component;
 

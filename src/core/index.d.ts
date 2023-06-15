@@ -1,10 +1,11 @@
 declare namespace Kreact {
   interface KreactElement {
-    type: string;
+    type: any;
     props: {
-      children: KreactElement['props']['children'];
-      key: KreactElement['props']['key'];
-      ref: KreactElement['props']['ref'];
+      children: KreactElement[];
+      key?: any;
+      ref?: KreactRef;
+      nodeValue?: any;
     };
   }
 
@@ -17,108 +18,17 @@ declare namespace Kreact {
     Consumer: (props: { children: (value: any) => KreactElement }) => KreactElement;
   }
 
-  interface KreactRefObject {
-    current: any;
-  }
-
-  interface KreactRef {
-    current: any;
-  }
-
-  interface KreactRefCallback {
-    (instance: any): void;
-  }
-
-  interface KreactRefObject {
-    current: any;
-  }
-
-  interface KreactRef {
-    current: any;
-  }
-
-  interface KreactRefCallback {
-    (instance: any): void;
-  }
-
-  interface KreactRefObject {
-    current: any;
-  }
-
-  interface KreactRef {
-    current: any;
-  }
-
-  interface KreactRefCallback {
-    (instance: any): void;
-  }
-
-  interface KreactRefObject {
-    current: any;
-  }
-
-  interface KreactRef {
-    current: any;
-  }
-
-  interface KreactRefCallback {
-    (instance: any): void;
-  }
-
-  interface KreactRefObject {
-    current: any;
-  }
-
-  interface KreactRef {
-    current: any;
-  }
-
-  interface KreactRefCallback {
-    (instance: any): void;
-  }
-
-  interface KreactRefObject {
-    current: any;
-  }
-
-  interface KreactRef {
-    current: any;
-  }
-
-  interface KreactRefCallback {
-    (instance: any): void;
-  }
-
-  interface KreactRefObject {
-    current: any;
-  }
-
-  interface KreactRef {
-    current: any;
-  }
-
-  interface KreactRefCallback {
-    (instance: any): void;
-  }
-
-  interface KreactRefObject {
-    current: any;
-  }
-
-  interface KreactRef {
-    current: any;
-  }
-
-  interface KreactRefCallback {
-    (instance: any): void;
-  }
-
-  interface KreactNode {
-    type: string;
+  interface KreactFragment {
+    type: 'FRAGMENT';
     props: {
-      children: KreactNode['props']['children'];
-      key: KreactNode['props']['key'];
-      ref: KreactNode['props']['ref'];
+      children: KreactElement[];
+      key?: any;
     };
   }
+
+  interface KreactRef {
+    current: any;
+  }
+
+  type KreactNode = ReactElement | string | number | KreactFragment | boolean | null | undefined;
 }

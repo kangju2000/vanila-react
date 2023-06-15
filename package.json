@@ -7,6 +7,7 @@
     "build:dev": "webpack --mode=development",
     "build:prod": "webpack --mode=production --node-env=production",
     "build:babel": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
+    "lint": "tsc --noEmit && prettier --check \"src/**/*.{ts,tsx}\"",
     "dev": "webpack serve"
   },
   "devDependencies": {

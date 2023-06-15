@@ -1,6 +1,8 @@
-import Kreact from '../Kreact';
+interface getElementWithStyleFunction {
+  (element: HTMLElement, props: any, oldProps?: any): HTMLElement;
+}
 
-const getElementWithStyle = (element, props, oldProps?) => {
+const getElementWithStyle: getElementWithStyleFunction = (element, props, oldProps) => {
   Object.keys(props).forEach(prop => {
     if (prop === 'ref' || prop === 'key' || prop === 'children') return;
     if (prop === 'className') {
@@ -29,7 +31,11 @@ const getElementWithStyle = (element, props, oldProps?) => {
   return element;
 };
 
-export function createVirtualDOM(element) {
+interface createVirtualDOMFunction {
+  (element: Kreact.KreactElement): HTMLElement | Text | DocumentFragment;
+}
+
+export const createVirtualDOM: createVirtualDOMFunction = element => {
   const { type, props } = element;
 
   if (type === 'TEXT_ELEMENT') return document.createTextNode(props.nodeValue);
@@ -48,16 +54,41 @@ export function createVirtualDOM(element) {
   });
 
   return newElement;
+};
+
+type CommitMapKey = 'appendChild' | 'removeChild' | 'replaceChild' | 'insertBefore';
+type CommitMapValue = {
+  root: HTMLElement;
+  child?: HTMLElement | Text | DocumentFragment;
+  newChild?: HTMLElement | Text | DocumentFragment;
+  oldChild?: HTMLElement | Text | DocumentFragment;
+};
+
+interface updateVirtualDOMFunction<T = HTMLElement> {
+  (
+    root: T,
+    oldNode: Kreact.KreactElement,
+    newNode: Kreact.KreactElement,
+    commitMap: Map<CommitMapKey, CommitMapValue>,
+    index?: number,
+  ): T | Map<string, any>;
 }
 
-export function updateVirtualDOM(root, oldNode, newNode, commitMap, index = 0) {
+export const updateVirtualDOM: updateVirtualDOMFunction = (
+  root,
+  oldNode,
+  newNode,
+  commitMap,
+  index = 0,
+) => {
   if (!oldNode) return commitMap.set('appendChild', { root, child: createVirtualDOM(newNode) });
-  if (!newNode) return commitMap.set('removeChild', { root, child: root.childNodes[index] });
+  if (!newNode)
+    return commitMap.set('removeChild', { root, child: root.childNodes[index] as HTMLElement });
   if (oldNode.type !== newNode.type)
     return commitMap.set('replaceChild', {
       root,
       newChild: createVirtualDOM(newNode),
-      oldChild: root.childNodes[index],
+      oldChild: root.childNodes[index] as HTMLElement,
     });
 
   if (
@@ -69,21 +100,21 @@ export function updateVirtualDOM(root, oldNode, newNode, commitMap, index = 0) {
     return commitMap.set('replaceChild', {
       root,
       newChild: newElement,
-      oldChild: root.childNodes[index],
+      oldChild: root.childNodes[index] as HTMLElement,
     });
   }
 
   const oldProps = oldNode.props;
   const newProps = newNode.props;
   if (oldNode.type !== 'TEXT_ELEMENT' && oldNode.type !== 'FRAGMENT') {
-    getElementWithStyle(root.childNodes[index], newProps, oldProps);
+    getElementWithStyle(root.childNodes[index] as HTMLElement, newProps, oldProps);
   }
 
   const max = Math.max(oldProps.children.length, newProps.children.length);
 
   for (let i = 0; i < max; i++) {
     updateVirtualDOM(
-      oldNode.type === 'FRAGMENT' ? root : root.childNodes[index],
+      oldNode.type === 'FRAGMENT' ? root : (root.childNodes[index] as HTMLElement),
       oldProps.children[i],
       newProps.children[i],
       commitMap,
@@ -92,9 +123,13 @@ export function updateVirtualDOM(root, oldNode, newNode, commitMap, index = 0) {
   }
 
   return root;
+};
+
+interface updateRealDOMFunction {
+  (commitMap: Map<string, any>): void;
 }
 
-export function updateRealDOM(commitMap) {
+export const updateRealDOM: updateRealDOMFunction = commitMap => {
   commitMap.forEach((value, key) => {
     switch (key) {
       case 'appendChild':
@@ -108,4 +143,4 @@ export function updateRealDOM(commitMap) {
         break;
     }
   });
-}
+};

@@ -1,19 +1,26 @@
 import styles from './index.module.css';
+import type { TodoType } from '@/types/todo';
 
-export default function TodoItem({ item, onCheckclick, onDeleteClick }) {
+interface TodoItemProps {
+  item: TodoType;
+  onCheckclick: (id: number) => void;
+  onDeleteClick: (id: number) => void;
+}
+
+export default function TodoItem({ item, onCheckclick, onDeleteClick }: TodoItemProps) {
   return (
     <li className={styles.item}>
       <div style={{ display: 'flex' }}>
         {/* attribute에서 분기 처리 안됨 */}
-        {item.idDone ? (
+        {item.completed ? (
           <>
             <input type="checkbox" onClick={() => onCheckclick(item.id)} checked />
-            <p className={styles.item__text__done}>{item.todo}</p>
+            <p className={styles.item__text__done}>{item.title}</p>
           </>
         ) : (
           <>
             <input type="checkbox" onClick={() => onCheckclick(item.id)} />
-            <p className={styles.item__text}>{item.todo}</p>
+            <p className={styles.item__text}>{item.title}</p>
           </>
         )}
       </div>

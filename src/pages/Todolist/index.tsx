@@ -1,9 +1,10 @@
 import { useState } from '@/core/Kreact';
 import TodoItem from '@/components/TodoItem';
 import styles from './index.module.css';
+import type { TodoType } from '@/types/todo';
 
 export default function TodoList() {
-  const [list, setList] = useState([]);
+  const [list, setList] = useState<TodoType[]>([]);
 
   const handleSubmit = (e: Event) => {
     e.preventDefault();
@@ -15,16 +16,18 @@ export default function TodoList() {
       return;
     }
 
-    setList(prev => [...prev, { id: prev.length, todo: value, idDone: false }]);
+    setList(prev => [...prev, { id: prev.length, title: value, completed: false }]);
 
     e.target[0].value = '';
   };
 
-  const handleCheckClick = id => {
-    setList(prev => prev.map(item => (item.id === id ? { ...item, idDone: !item.idDone } : item)));
+  const handleCheckClick = (id: number) => {
+    setList(prev =>
+      prev.map(item => (item.id === id ? { ...item, completed: !item.completed } : item)),
+    );
   };
 
-  const handleDeleteClick = id => {
+  const handleDeleteClick = (id: number) => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
     setList(prev => {
@@ -44,7 +47,7 @@ export default function TodoList() {
         <button className={styles.todolist__form__add}>추가</button>
       </form>
       <ul className={styles.todolist__list}>
-        {list.map((item, index) => (
+        {list.map(item => (
           <TodoItem item={item} onCheckclick={handleCheckClick} onDeleteClick={handleDeleteClick} />
         ))}
       </ul>
