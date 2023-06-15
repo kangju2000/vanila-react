@@ -1,4 +1,14 @@
-import { updateRealDOM, updateVirtualDOM } from "../KreactDOM";
+import { updateRealDOM, updateVirtualDOM } from '../KreactDOM';
+
+type KreactElement = {
+  type: string | Function;
+  props: {
+    children: KreactElement[];
+    nodeValue?: string;
+    ref?: any;
+    key?: any;
+  };
+};
 
 function kreact() {
   const _states = [];
@@ -7,18 +17,19 @@ function kreact() {
   let _rootComponent = null;
   let _oldNode = null;
   let _newNode = null;
-  let flag = false;
 
-  function useState(initialState) {
+  function useState<S>(
+    initialState: S | (() => S),
+  ): [S, (newState: S | ((prevState: S) => S)) => void] {
     let stateIndex = _stateIndex++;
 
     if (_states[stateIndex] === undefined) {
-      if (typeof initialState === 'function') initialState = initialState();
+      if (initialState instanceof Function) initialState = initialState();
       _states[stateIndex] = initialState;
     }
     let state = _states[stateIndex];
 
-    const setState = (newState) => {
+    const setState = (newState: S) => {
       if (typeof newState === 'function') newState = newState(state);
       if (Object.is(_states[stateIndex], newState)) return;
       _states[stateIndex] = newState;
@@ -29,26 +40,29 @@ function kreact() {
     return [state, setState];
   }
 
-  function useContext(context) {
+  function useContext(context: any) {
     return context._currentValue;
   }
 
-  function createContext(defaultValue) {
+  function createContext<T = any>(defaultValue?: T) {
     const context = {
       _currentValue: defaultValue,
-      Provider: function ({ value, children }) {
+      Provider: function ({ value, children }: { value: T; children?: any }) {
         context._currentValue = value;
         return children;
       },
       Consumer: function ({ children }) {
         return children(context._currentValue);
-      }
+      },
     };
+
     return context;
   }
 
-  function createElement(type, config, ...children) {
-    const props = {};
+  function createElement(type: any, config: any, ...children: any[]) {
+    const props: KreactElement['props'] = {
+      children: [],
+    };
     let ref = null;
     let key = null;
 
@@ -57,7 +71,11 @@ function kreact() {
       if (config.key) key = config.key;
 
       for (let propName in config) {
-        if (Object.hasOwnProperty.call(config, propName) && propName !== 'ref' && propName !== 'key') {
+        if (
+          Object.hasOwnProperty.call(config, propName) &&
+          propName !== 'ref' &&
+          propName !== 'key'
+        ) {
           props[propName] = config[propName];
         }
       }
@@ -70,7 +88,7 @@ function kreact() {
           props: {
             nodeValue: child,
             children: [],
-          }
+          },
         };
         return [...array, el];
       }
@@ -81,7 +99,7 @@ function kreact() {
     }, []);
 
     if (typeof type === 'function') {
-      if (typeof type === fragment) return fragment(props, key);
+      if (type === fragment) return fragment(props, key);
 
       const el = type(props);
 
@@ -89,7 +107,7 @@ function kreact() {
         ...el.props,
         ref,
         key,
-      }
+      };
 
       return el;
     }
@@ -100,26 +118,26 @@ function kreact() {
         ...props,
         ref,
         key,
-      }
-    }
+      },
+    };
 
     return element;
   }
 
-  function fragment(props, key) {
+  function fragment(props: KreactElement['props'], key: KreactElement['props']['key']) {
     const element = {
       type: 'FRAGMENT',
       props: {
         ...props,
         key,
-      }
-    }
+      },
+    };
 
     return element;
   }
 
   function _render() {
-    console.log('렌더링')
+    console.log('렌더링');
     _newNode = _rootComponent();
 
     const commitMap = new Map();
@@ -132,17 +150,24 @@ function kreact() {
   function render(root, component) {
     _root = root;
     _rootComponent = component;
+
     _oldNode = null;
 
     _render();
   }
 
   return {
-    useState, render, useContext, createContext, createElement, fragment
+    useState,
+    render,
+    useContext,
+    createContext,
+    createElement,
+    fragment,
   };
 }
 
 const Kreact = kreact();
 
 export const { useState, render, useContext, createContext, createElement, fragment } = Kreact;
+
 export default Kreact;

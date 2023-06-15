@@ -1,9 +1,13 @@
-import { RouterContext } from "../../App";
-import Kreact from "../Kreact";
+import { useContext } from '@/core/Kreact';
+import { RouterContext } from '@/App';
 
-export function Outlet({ pathname }) {
+interface OutletProps {
+  pathname: string;
+}
+
+export default function Outlet({ pathname }: OutletProps) {
   setTimeout(() => {
-    const router = Kreact.useContext(RouterContext);
+    const router = useContext(RouterContext);
     if (!router) {
       return;
     }
@@ -16,8 +20,5 @@ export function Outlet({ pathname }) {
     router.push(pathname, { outlet: true });
   }, 0);
 
-
   return <div id={pathname}></div>;
 }
-
-export default Outlet;

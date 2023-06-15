@@ -1,6 +1,6 @@
-import Kreact from "../Kreact";
+import Kreact from '../Kreact';
 
-const getElementWithStyle = (element, props, oldProps) => {
+const getElementWithStyle = (element, props, oldProps?) => {
   Object.keys(props).forEach(prop => {
     if (prop === 'ref' || prop === 'key' || prop === 'children') return;
     if (prop === 'className') {
@@ -27,7 +27,7 @@ const getElementWithStyle = (element, props, oldProps) => {
   });
 
   return element;
-}
+};
 
 export function createVirtualDOM(element) {
   const { type, props } = element;
@@ -48,20 +48,29 @@ export function createVirtualDOM(element) {
   });
 
   return newElement;
-};
+}
 
 export function updateVirtualDOM(root, oldNode, newNode, commitMap, index = 0) {
   if (!oldNode) return commitMap.set('appendChild', { root, child: createVirtualDOM(newNode) });
   if (!newNode) return commitMap.set('removeChild', { root, child: root.childNodes[index] });
-  if (oldNode.type !== newNode.type) return commitMap.set('replaceChild', { root, newChild: createVirtualDOM(newNode), oldChild: root.childNodes[index] });
+  if (oldNode.type !== newNode.type)
+    return commitMap.set('replaceChild', {
+      root,
+      newChild: createVirtualDOM(newNode),
+      oldChild: root.childNodes[index],
+    });
 
   if (
-    oldNode.type === 'TEXT_ELEMENT'
-    && newNode.type === 'TEXT_ELEMENT'
-    && oldNode.props.nodeValue !== newNode.props.nodeValue
+    oldNode.type === 'TEXT_ELEMENT' &&
+    newNode.type === 'TEXT_ELEMENT' &&
+    oldNode.props.nodeValue !== newNode.props.nodeValue
   ) {
     const newElement = createVirtualDOM(newNode);
-    return commitMap.set('replaceChild', { root, newChild: newElement, oldChild: root.childNodes[index] });
+    return commitMap.set('replaceChild', {
+      root,
+      newChild: newElement,
+      oldChild: root.childNodes[index],
+    });
   }
 
   const oldProps = oldNode.props;
@@ -78,7 +87,7 @@ export function updateVirtualDOM(root, oldNode, newNode, commitMap, index = 0) {
       oldProps.children[i],
       newProps.children[i],
       commitMap,
-      i
+      i,
     );
   }
 

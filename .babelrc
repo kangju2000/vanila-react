@@ -7,5 +7,16 @@
         "pragmaFrag": "Kreact.fragment"
       }
     ]
+  ],
+  "presets": [
+    "@babel/preset-typescript",
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "browsers": [">= 1%"]
+        }
+      }
+    ]
   ]
 }
